@@ -225,24 +225,14 @@ export default function App() {
 
   const ctxRef = useRef(null);
   const cidRef = useRef(0);
-  const refs   = useRef({ total: 0, my: 0, today: 0, csTotal: {}, csToday: {} });
+  const refs   = useRef({ total: 0, my: 0, today: 0, fsDate: "", lastDate: td(), csTotal: {}, csToday: {} });
 
   // ── Load persisted state ──────────────────────────────────────────────────
   useEffect(() => {
     async function init() {
       // totalFarts is now seeded by the Firestore onSnapshot listener below
       try { const r = await window.storage.get("ffg6_my");           if (r) { const v = parseInt(r.value)||0; setMyFarts(v);    refs.current.my    = v; } } catch(e){}
-      try {
-        const r = await window.storage.get("ffg6_day", true);
-        if (r) {
-          const p = JSON.parse(r.value);
-          if (p.date === td()) {
-            const a = parseFloat(p.amount)||0;
-            setTodayD(a); refs.current.today = a;
-            if (a >= CAP) setCapped(true);
-          }
-        }
-      } catch(e) {}
+      // Daily cap & todayD are now driven by the Firestore onSnapshot listener
       // Charity selection
       try {
         const r = await window.storage.get("ffg6_charity");
@@ -274,27 +264,20 @@ export default function App() {
     init();
   }, []);
 
-  // ── Midnight reset check (runs every 60s) ─────────────────────────────────
+  // ── Midnight reset check (runs every 60s) — resets per-charity local stats ──
   useEffect(() => {
-    const check = async () => {
-      try {
-        const r = await window.storage.get("ffg6_day", true);
-        if (!r) return;
-        const p = JSON.parse(r.value);
-        if (p.date !== td()) {
-          // New day — reset daily totals
-          setTodayD(0); refs.current.today = 0; setCapped(false);
-          const newCsToday = Object.fromEntries(CHARITIES.map((c) => [c.id, 0]));
-          refs.current.csToday = newCsToday;
-          setCharityStats((prev) =>
-            Object.fromEntries(CHARITIES.map((c) => [c.id, { ...prev[c.id], today: 0 }]))
-          );
-          window.storage.set("ffg6_day", JSON.stringify({ date: td(), amount: 0 }), true).catch(() => {});
-          for (const c of CHARITIES) {
-            window.storage.set(`ffg6_cday_${c.id}`, JSON.stringify({ date: td(), amount: 0 }), true).catch(() => {});
-          }
+    const check = () => {
+      if (refs.current.lastDate !== td()) {
+        refs.current.lastDate = td();
+        const newCsToday = Object.fromEntries(CHARITIES.map((c) => [c.id, 0]));
+        refs.current.csToday = newCsToday;
+        setCharityStats((prev) =>
+          Object.fromEntries(CHARITIES.map((c) => [c.id, { ...prev[c.id], today: 0 }]))
+        );
+        for (const c of CHARITIES) {
+          window.storage.set(`ffg6_cday_${c.id}`, JSON.stringify({ date: td(), amount: 0 }), true).catch(() => {});
         }
-      } catch(e) {}
+      }
     };
     const id = setInterval(check, 60000);
     return () => clearInterval(id);
@@ -304,9 +287,16 @@ export default function App() {
   useEffect(() => {
     if (!db) return;
     const unsub = onSnapshot(doc(db, "counters", "global"), (snap) => {
-      const farts = snap.exists() ? (snap.data().farts || 0) : 0;
+      const data = snap.exists() ? snap.data() : {};
+      const farts = data.farts || 0;
+      const isToday = data.dailyDate === td();
+      const dailyAmt = isToday ? (data.dailyFarts || 0) * CENT : 0;
+      refs.current.total   = farts;
+      refs.current.today   = dailyAmt;
+      refs.current.fsDate  = data.dailyDate || "";
       setTotalFarts(farts);
-      refs.current.total = farts;
+      setTodayD(dailyAmt);
+      setCapped(dailyAmt >= CAP);
     });
     return () => unsub();
   }, []);
@@ -352,16 +342,22 @@ export default function App() {
 
     // Persist per-device state in localStorage
     window.storage.set("ffg6_my",    String(nM)).catch(() => {});
-    window.storage.set("ffg6_day",   JSON.stringify({ date: td(), amount: nD }), true).catch(() => {});
     window.storage.set(`ffg6_ctotal_${currentCharity}`, String(newCsTotal[currentCharity])).catch(() => {});
     window.storage.set(`ffg6_cday_${currentCharity}`,   JSON.stringify({ date: td(), amount: newCsToday[currentCharity] }), true).catch(() => {});
 
-    // Fire-and-forget: sync to Firestore (global counter + log entry)
+    // Fire-and-forget: sync to Firestore (global counter + global daily cap)
     if (db) {
-      setDoc(doc(db, "counters", "global"), { farts: increment(1) }, { merge: true }).catch(() => {});
+      const today = td();
+      const isNewDay = refs.current.fsDate !== today;
+      setDoc(doc(db, "counters", "global"), {
+        farts:      increment(1),
+        dailyFarts: isNewDay ? 1 : increment(1),
+        dailyDate:  today,
+      }, { merge: true }).catch(() => {});
+      if (isNewDay) refs.current.fsDate = today;
       addDoc(collection(db, "fartLog"), {
         timestamp: new Date().toISOString(),
-        date:      td(),
+        date:      today,
         charity:   currentCharity,
         amount:    CENT,
       }).catch(() => {});
