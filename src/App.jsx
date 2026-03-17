@@ -555,9 +555,11 @@ export default function App() {
       </section>
 
       {/* ── Marquee ── */}
-      <div style={{ background:B90, padding:"12px 0", overflow:"hidden", whiteSpace:"nowrap" }}>
-        <div style={{ display:"inline-block", animation:"scroll 20s linear infinite" }}>
-          <span style={{ color:W, fontSize:14, fontWeight:700, letterSpacing:.5, fontFamily:FONT_TEXT }}>{marquee}{marquee}</span>
+      <div style={{ background:B90, padding:"12px 0", overflow:"hidden" }}>
+        <div style={{ display:"flex", width:"max-content", animation:"scroll 20s linear infinite" }}>
+          {[0,1].map((i) => (
+            <span key={i} style={{ whiteSpace:"nowrap", color:W, fontSize:14, fontWeight:700, letterSpacing:.5, fontFamily:FONT_TEXT, paddingRight:"3rem" }}>{marquee}</span>
+          ))}
         </div>
       </div>
 
