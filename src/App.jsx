@@ -395,7 +395,7 @@ export default function App() {
   const off       = capped || cooling;
 
   // Marquee: total farts → by you → donated → charity
-  const marquee = `\u00A0\u00A0\u00A0 ${totalFarts.toLocaleString()} global farts \u00A0\u00A0 \uD83D\uDCA8 \u00A0\u00A0 ${myFarts.toLocaleString()} by you \u00A0\u00A0 \uD83D\uDCA8 \u00A0\u00A0 $${donated} donated \u00A0\u00A0 \uD83D\uDCA8 \u00A0\u00A0 Farting for ${sel.name} \u00A0\u00A0 \uD83D\uDCA8`;
+  const marqueeItem = `${totalFarts.toLocaleString()} global farts  💨  ${myFarts.toLocaleString()} by you  💨  $${donated} donated  💨  Farting for ${sel.name}`;
 
   const SHARE_TARGETS = [
     { name:"X",        bg:"#000",    color:W, icon:"𝕏",  fn:()=>window.open("https://twitter.com/intent/tweet?text="+encodeURIComponent("I'm farting for charity. Every toot donates $0.001 to water & sanitation. Yes, really. ")+"&url="+encodeURIComponent(window.location.href),"_blank") },
@@ -551,10 +551,10 @@ export default function App() {
       </section>
 
       {/* ── Marquee ── */}
-      <div style={{ background:B90, padding:"12px 0", overflow:"hidden" }}>
-        <div style={{ display:"flex", animation:"scroll 20s linear infinite" }}>
-          {[0,1].map((i) => (
-            <span key={i} style={{ display:"inline-block", whiteSpace:"nowrap", minWidth:"100vw", color:W, fontSize:14, fontWeight:700, letterSpacing:.5, fontFamily:FONT_TEXT }}>{marquee}</span>
+      <div style={{ background:B90, padding:"10px 0", overflow:"hidden" }}>
+        <div style={{ display:"flex", width:"max-content", animation:"scroll 35s linear infinite" }}>
+          {Array.from({length:8}).map((_, i) => (
+            <span key={i} style={{ whiteSpace:"nowrap", flexShrink:0, color:W, fontSize:14, fontWeight:700, letterSpacing:.3, fontFamily:FONT_TEXT, paddingRight:"5rem" }}>{marqueeItem}</span>
           ))}
         </div>
       </div>
