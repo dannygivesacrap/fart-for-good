@@ -484,10 +484,10 @@ export default function App() {
       {showProto && (
         <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,.5)", zIndex:10001, display:"flex", alignItems:"center", justifyContent:"center", padding:20 }} onClick={()=>setShowProto(false)}>
           <div style={{ background:W, borderRadius:20, padding:"32px 28px", maxWidth:420, width:"100%", textAlign:"center" }} onClick={(e)=>e.stopPropagation()}>
-            <div style={{ fontSize:40, marginBottom:12 }}>💨🚽</div>
-            <h3 style={{ fontSize:22, fontWeight:800, fontStyle:"italic", color:B90, margin:"0 0 12px", fontFamily:FONT_DISPLAY }}>Thanks for farting with us!</h3>
-            <p style={{ fontSize:15, color:D, lineHeight:1.6, margin:"0 0 16px", fontFamily:FONT_BODY }}>This is just a prototype for now, so no real donations are being made yet.</p>
-            <p style={{ fontSize:13, color:M, lineHeight:1.6, margin:"0 0 20px", fontFamily:FONT_BODY }}>But we're working on it! When this goes live, every toot will trigger a real micro-donation to water & sanitation charities.</p>
+            <div style={{ fontSize:40, marginBottom:12 }}>💨</div>
+            <h3 style={{ fontSize:22, fontWeight:800, fontStyle:"italic", color:B90, margin:"0 0 16px", fontFamily:FONT_DISPLAY }}>Thanks for farting!</h3>
+            <p style={{ fontSize:15, color:D, lineHeight:1.6, margin:"0 0 12px", fontFamily:FONT_BODY }}>This is just a prototype for now, so no real donations are being made yet. But if you're a fan, let me know and maybe we can make this a real thing!</p>
+            <p style={{ fontSize:15, color:D, lineHeight:1.6, margin:"0 0 24px", fontFamily:FONT_BODY }}>Thaaaaanks,<br/>Danny</p>
             <button onClick={()=>setShowProto(false)} style={{ background:L70, color:D, padding:"12px 32px", borderRadius:100, fontSize:15, fontWeight:700, cursor:"pointer", border:"none", fontFamily:FONT_TEXT }}>Keep farting</button>
           </div>
         </div>
