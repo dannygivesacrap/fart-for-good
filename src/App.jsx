@@ -67,13 +67,14 @@ function td() { return new Date().toISOString().slice(0, 10); }
 // ── Real fart sounds ──────────────────────────────────────────────────────
 var SOUNDS = [
   ...Array.from({length:23}, (_,i) => `/sounds/fart-${String(i+1).padStart(2,'0')}.mp3`),
-  '/sounds/fart-24.wav',
   '/sounds/fart-25.mp3',
   '/sounds/fart-26.wav',
   '/sounds/fart-27.wav',
-  ...Array.from({length:3}, (_,i) => `/sounds/fart-${String(i+28).padStart(2,'0')}.mp3`),
+  '/sounds/fart-29.mp3',
+  '/sounds/fart-30.mp3',
   '/sounds/fart-31.wav',
-  ...Array.from({length:42}, (_,i) => `/sounds/fart-${String(i+32).padStart(2,'0')}.mp3`),
+  ...Array.from({length:8}, (_,i) => `/sounds/fart-${String(i+32).padStart(2,'0')}.mp3`),
+  '/sounds/fart-49.mp3',
 ];
 function playFart() {
   var src = SOUNDS[Math.floor(Math.random() * SOUNDS.length)];
