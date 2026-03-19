@@ -64,6 +64,24 @@ function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
 function cl(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
 function td() { return new Date().toISOString().slice(0, 10); }
 
+// ── Real fart sounds ──────────────────────────────────────────────────────
+var SOUNDS = [
+  ...Array.from({length:23}, (_,i) => `/sounds/fart-${String(i+1).padStart(2,'0')}.mp3`),
+  '/sounds/fart-24.wav',
+  '/sounds/fart-25.mp3',
+  '/sounds/fart-26.wav',
+  '/sounds/fart-27.wav',
+  ...Array.from({length:3}, (_,i) => `/sounds/fart-${String(i+28).padStart(2,'0')}.mp3`),
+  '/sounds/fart-31.wav',
+  ...Array.from({length:42}, (_,i) => `/sounds/fart-${String(i+32).padStart(2,'0')}.mp3`),
+];
+function playFart() {
+  var src = SOUNDS[Math.floor(Math.random() * SOUNDS.length)];
+  var a = new Audio(src);
+  a.volume = 0.8;
+  a.play().catch(() => {});
+}
+
 // ── Improved fart synthesis (pink noise with baked-in flutter) ─────────────
 // Pink noise generator using Voss-McCartney algorithm.
 // Flutter and envelope are baked directly into the buffer for a natural sound.
@@ -304,8 +322,7 @@ export default function App() {
   // ── Fart handler ───────────────────────────────────────────────────────────
   const doFart = useCallback((e) => {
     if (capped || cooling) return;
-    if (!ctxRef.current) ctxRef.current = new (window.AudioContext || window.webkitAudioContext)();
-    makeFart(ctxRef.current);
+    playFart();
 
     setLastFart(pick(FARTS));
     setReaction(pick(REACT));
@@ -552,7 +569,7 @@ export default function App() {
 
       {/* ── Marquee ── */}
       <div style={{ background:B90, padding:"10px 0", overflow:"hidden" }}>
-        <div style={{ display:"flex", width:"max-content", animation:"scroll 40s linear infinite" }}>
+        <div style={{ display:"flex", width:"max-content", animation:"scroll 60s linear infinite" }}>
           {Array.from({length:6}).map((_, i) => (
             <span key={i} style={{ whiteSpace:"nowrap", flexShrink:0, color:W, fontSize:16, fontWeight:700, letterSpacing:.2, fontFamily:FONT_TEXT, paddingRight:0 }}>{marqueeItem}</span>
           ))}
